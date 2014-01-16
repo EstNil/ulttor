@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+	 <link href="__PUBLIC__/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+<style>
+	
+	.tx{
+		resize:none;
+		width:300px;
+	}
+	.addmission{
+		font-size:17px;
+		line-height: 17px;
+		padding-top:20px;
+		background: #ababab;
+		padding:5px;
+		box-shadow: 1px 1px 5px #111;
+		border-radius: 2px 2px 2px 2px;
+		width:100%;
+	}
+	.showlog{
+		margin-top:5px;
+		margin-left:auto;
+		margin-right:auto;
+		background: #eee;
+		color:green;
+		width:98%;
+		min-height:400px;
+		overflow: auto;
+	}
+</style>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#addm').on('click', function(event) {
+			var poster=$("input[name='poster']").val();
+			var content=$("input[name='content']").val();
+			var finisher=$("select[name='finisher']").val();
+			var finishtime=$("input[name='finishtime']").val();
+
+
+			if(content==""||finishtime==""){
+				alert("内容或日期不可为空");
+				return;
+			}
+			addm(poster,content,finisher,finishtime);
+		});
+	});
+	function addm(poster,content,finisher,finishtime){
+		$.ajax({
+			url: '__MODULE__/Mission/addMission',
+			type: 'post',
+			data: {'content': content,'poster':poster,'finisher':finisher,'finishtime':finishtime},
+		})
+		.done(function(data) {
+			console.log("success");
+			if(data=="success"){
+				$("input[name='content']").val("");
+				location.reload();
+			}else{
+				alert("添加失败,请确认输入无误!");
+			}
+		})
+		.fail(function() {
+			console.log("error");
+		})
+		.always(function() {
+			console.log("complete");
+			
+		});
+		
+	}
+
+</script>
+</head>
+<body>
+<div class="addmission">
+	<form class="text-center form-inline" action="" method="post">
+		<input type="hidden" name="poster" value="{$Think.session.username}">
+		
+		<div class="form-group">
+			<label for="" class="sr-only"></label>
+			向
+			<select name="finisher" class="form-control">
+				<volist name="oneteamusers" id="vo">
+					<option value="{$vo.username}">{$vo.username}</option>
+				</volist>
+
+			</select>
+		</div>
+		<div class="glyphicon glyphicon-plus"></div>
+		<div class="form-group">
+			<label for="" class="sr-only"></label>
+			 <input name="content" class="tx form-control" placeholder="任务内容">
+		</div>
+
+		<div class="form-group">
+            <label for="dtp_input2" class=""></label>
+            <div class="input-group date form_date" data-date="" data-date-format="dd MM yyyy" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+
+            <input class="form-control" size="10" type="text" name="finishtime" placeholder="日期" readonly>
+			<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+            </div>
+			<input type="hidden" id="dtp_input2" value="" /><br/>
+        </div>
+		 &nbsp;&nbsp;
+		<input type="button" id="addm" class="btn btn-primary" value="添加任务">
+	</form>
+</div>
+<div class="showlog">
+	<h4>今日添加记录</h4>
+	<volist name="newmlist" id="vo">
+		&nbsp;&nbsp;
+		{$vo.posttime|substr=11,17} : 
+		<span class="text-warning">{$vo.poster}</span> -> <span class="text-danger">{$vo.finisher}</span> +任务 
+		<span class="text-info">[{$vo.content}]</span>;
+		<br>
+	</volist>
+</div>
+<script type="text/javascript" src="__PUBLIC__/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="__PUBLIC__/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<script type="text/javascript">
+	$('.form_date').datetimepicker({
+        language:  'zh-CN',
+        format:'yyyy-mm-dd',
+        weekStart: 1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 2,
+		minView: 2,
+		forceParse: 0
+    });
+
+</script>
+</body>
+</html>
+
+

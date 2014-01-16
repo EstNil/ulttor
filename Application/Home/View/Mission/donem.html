@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<style>
+		.showm{
+			font-size: 16px;
+			width:90%;
+			margin:0px auto;
+		}
+		.block_row{
+			padding-top:2px;
+			box-shadow: 0px 1px 3px #aaa;
+			margin-top:3px;
+			background: #d5d5d5;
+			overflow: hidden;
+		}
+		.del{
+			font-size:18px;
+			text-shadow:1px 1px 3px #bbb;
+			color:black;
+		}
+		.del:hover{
+			cursor: pointer;
+		}
+	</style>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.del').tooltip({
+		      container: "body",
+		    }).hover(function() {
+		    	$(this).tooltip("show");
+		    }, function() {
+		    	/* Stuff to do when the mouse leaves the element */
+		    	$(this).tooltip("hide");
+		    }).on('click', function(event) {
+		    	id=$(this).parent().find('#id').val();
+		    	id=$.trim(id);
+		    	if(id!=""){
+		    		delm(id);
+		    	}
+		    });
+		});
+		function delm(id){
+			$.ajax({
+				url: '__MODULE__/Mission/delMission',
+				type: 'post',
+				data: {'id': id},
+			})
+			.done(function(data) {
+				console.log("success");
+				if(data=="success"){
+					alert("删除成功!");
+					location.reload();
+				}else{
+					alert("删除失败!");
+					location.reload();
+				}
+			})
+			.fail(function() {
+				console.log("error");
+			})
+			.always(function() {
+				console.log("complete");
+			});
+			
+		}
+	</script>
+</head>
+<body>
+	<div class="donemission">
+		<!-- 搜索菜单 -->
+		<div class="searchm">
+			<form class="navbar-form" role="search" action="" method="post">
+			    <div class="form-group">
+			    	<input type="text" class="form-control" placeholder="搜索">
+			    </div>
+			    <button type="submit" class="btn btn-default">搜索</button>
+			</form>
+		</div>
+		<!-- 显示内容 -->
+		<div class="showm">
+			<volist name="donem" id="vo">
+				<div class="block_row row" style="color:;">
+					<div class="col-md-4" style="text-align:right">
+						<input type="hidden" id="id" value="{$vo.id}">
+						<span class="del glyphicon glyphicon-trash" data-placement="left" data-toggle="tooltip" data-original-title="删除"></span>
+						<span class="text-info">我  {$vo.finishtime}</span>
+						<span class="glyphicon glyphicon-ok-circle"></span>
+						<span class="text-danger">{$vo.poster|substr=0,10}'s</span>
+					</div>
+					<div class="col-md-6">
+						<span class="text-success">{$vo.content};</span>
+					</div>
+				</div>
+			</volist>	
+
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<html>
+<style>
+	.addmember{
+		font-size:17px;
+		line-height: 17px;
+		padding-top:20px;
+		background: #ababab;
+		padding:5px;
+		box-shadow: 1px 1px 5px #111;
+		border-radius: 2px 2px 2px 2px;
+		width:100%;
+		min-height:80px;
+		padding-top:22px;
+	}	
+	.controlmember{
+		padding-top:2px;
+		padding-left: 5px;
+		background: #EEEEEE;
+		margin: 10px auto;
+		width:98%;
+		height: 450px;
+	}
+	.block_member{
+		box-shadow: 0px 1px 2px #666;
+		text-align: center;
+		margin:2px;
+		padding:2px;
+	}
+</style>
+<script type="text/javascript">
+	$(document).ready(function() {
+		var selectProject="";
+		$("#select_project").on('change', function(event) {
+			selectProject=$(this).val();
+			getMember(selectProject);
+		});
+		$(".del_member").live('click', function(event) {
+			var member=$(this).parent().find("#del_member").html();
+			member=$.trim(member);
+			alert(member+selectProject);
+			delMember(selectProject,member);
+		});
+		$("#addproject").on('click', function(event) {
+			var member=$("#input_name").val();
+			var type=$("#input_type").val();
+			var project=$("#input_project").val();
+			doAddMember(project,member,type);
+		});
+	});
+	//添加新成员
+	function doAddMember(project,member,type){
+		$.ajax({
+			url: '__MODULE__/Control/doAddMember',
+			type: 'post',
+			data: {'project': project,'member':member,'type':type},
+		})
+		.done(function(data) {
+			console.log("success");
+			console.log(data);
+			if(data=="success"){
+				location.reload();
+			}else{
+				alert("添加失败");
+			}
+		})
+		.fail(function() {
+			console.log("error");
+		})
+		.always(function() {
+			console.log("complete");
+		});
+		
+	}
+	//获取项目成员
+	function getMember(name){
+		$.ajax({
+			url: '__MODULE__/Control/doGetMember',
+			type: 'post',
+			data: {'name': name},
+		})
+		.done(function(data) {
+			console.log("success");
+			console.log(data);
+			showMember(data);
+		})
+		.fail(function() {
+			console.log("error");
+		})
+		.always(function() {
+			console.log("complete");
+		});
+	}
+	function showMember(data){
+		var length=data.length;
+		var re="";
+		for(i=0;i<length;i++){
+			re=re+"<div class='col-md-3'><div class='block_member'>";
+			re=re+"<span class='text-left text-success'>"+data[i].type+"&nbsp;&nbsp;</span>";
+			re=re+"<span class='text-info' id='del_member'>"+data[i].member+"</span>";
+			re=re+"&nbsp;&nbsp;<span class='del_member btn btn-danger btn-sm'>删</span></div></div>";
+		}
+		$(".showmember").html(re);
+
+	}
+	//删除成员
+	function delMember(project,member){
+		$.ajax({
+			url: '__MODULE__/Control/doDelMember',
+			type: 'post',
+			data: {'project': project,'member':member},
+		})
+		.done(function(re) {
+			console.log("success");
+			if(re=="success"){
+				location.reload();
+			}else if(re=="creater"){
+				alert("不可删除创建者");
+			}
+			else{
+				alert("删除失败");
+			}
+		})
+		.fail(function() {
+			console.log("error");
+		})
+		.always(function() {
+			console.log("complete");
+		});
+		
+	}
+</script>
+<!-- 添加成员 -->
+<div class="addmember">
+	<form class="text-center form-inline" action="" method="post">	
+		<input type="button" id="addproject" class="btn btn-primary" value="添加">
+		<div class="form-group">
+			<label for="" class="sr-only"></label>
+			<input name="name" id="input_name" class="form-control" placeholder="成员名称">	
+		</div>
+		到
+		<!-- 项目选择 -->
+		<div class="form-group">
+			<label for="" class="sr-only"></label>
+			<select name="project" id="input_project" class="form-control" style="min-width:100px;">
+				<volist name="projectlist" id="vo">
+					<option value="{ $vo.name}">{$vo.name}</option>
+				</volist>
+			</select>
+		</div>
+		项目组，担任
+		<div class="form-group">
+            <label for="dtp_input2" class=""></label>
+            	<select name="project" id="input_type" class="form-control" style="min-width:100px;">
+					<option value="headman">组长</option>
+					<option value="member">成员</option>
+					<option value="else">其他</option>
+				</select>
+			<br/>
+        </div>
+	</form>
+</div>
+<!-- 显示成员/进行删除等操作 -->
+<div class="controlmember">
+	<h4>成员管理</h4>
+	<div class="form-group form-inline">
+	<label for="" >项目选择</label>
+	<select class="form-control" style="min-width:100px;" name="projectname" id="select_project">
+		<volist name="projectlist" id="vo">
+			<option value="{$vo.name}">{$vo.name}</option>
+		</volist>
+	</select>
+	</div>
+	<!-- 显示成员 -->
+	<div class="showmember">		
+		<volist name="memberlist" id="vo">
+			<div class="col-md-3">
+				<div class="block_member">
+					<span class="text-info">
+						{$vo.member}
+					</span>
+					<span class="del_member btn btn-danger btn-sm">
+						删
+					</span>
+				</div>
+			</div>
+		</volist>	
+	</div>
+</div>
+
+</html>

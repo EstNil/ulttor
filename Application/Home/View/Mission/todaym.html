@@ -1,0 +1,141 @@
+<html>
+<head>
+<style>
+	h4{
+		padding-left:4px;
+		text-shadow:2px 1px 3px black;
+		color:#E7FFE5;
+	}
+	.todaymission{
+		margin-top:5px;
+	}
+	.block{
+		padding:2px;
+		background: #ababab;
+		box-shadow: 1px 1px 5px #ccc;
+		border-radius: 2px 2px 2px 2px;
+		min-height:550px;
+		margin-left:46px;
+	}
+	.block_row{
+		margin-top:4px;
+		width:100;
+		margin-left:3px;
+		height:42px;
+		line-height: 42px;
+		
+	}
+	.block-left{
+		width:9%;
+		font-size: 25px;
+		padding-left:3px;
+		padding-right: 3px;
+		float:left;
+		box-shadow: 0px 1px 3px #666;
+		color:#333;
+	}
+	.block-mid{
+		float:left;
+		width:80%;
+		box-shadow: 0px 1px 3px #666;
+		background: #cdcdcd;
+		height:42px;
+		padding-left:2px;
+		
+		overflow-y:auto;
+
+	}
+	.block-right{
+		width:10%;
+		font-size: 26px;
+		float:left;
+		padding-left:5px;
+		padding-right: 5px;
+		box-shadow: 1px 1px 3px #666;
+		color:#333;
+	}
+	.block-right:hover{
+		cursor: pointer;
+	}
+
+</style>
+<script>
+	$(document).ready(function() {
+		$('.block-right').tooltip({
+	      container: "body",
+	    }).hover(function() {
+	    	$(this).tooltip("show");
+	    }, function() {
+	    	/* Stuff to do when the mouse leaves the element */
+	    	$(this).tooltip("hide");
+	    }).on('click', function(event) {
+	    	id=$(this).parent().find('#id').val();
+	    	id=$.trim(id);
+	    	if(id!=""){
+	    		doneMission(id);
+	    	}
+	    });
+	});
+	//标记为完成
+	function doneMission(id){
+		$.ajax({
+			url: '__MODULE__/Mission/doneMission',
+			type: 'post',
+			data: {"id": id},
+		})
+		.done(function(data) {
+			console.log("success");
+			console.log(data);
+		})
+		.fail(function() {
+			console.log("error");
+		})
+		.always(function() {
+			console.log("complete");
+			location.reload();
+		});
+		
+	}
+</script>
+</head>
+<div class="todaymission row">
+	<div class="block col-md-5 col-md-offset-1">
+		<h4>今日任务</h4>
+		<volist name="mlist" id="vo">
+			<div class="block_row">
+				<span class="block-left">
+					<span class="glyphicon glyphicon-bookmark"></span>
+				</span>
+
+				<input type="hidden" id="id" value="{$vo.id}">
+				<div class="block-mid">
+					{$vo.content}
+				</div>
+				<div class="block-right" title="" data-placement="right" data-toggle="tooltip" data-original-title="标记为完成">
+					<span class="glyphicon glyphicon-check"></span>
+				</div>
+
+			</div>
+		
+		</volist>
+	</div>
+	<div class="block col-md-5 ">
+		<h4>今日完成任务</h4>
+		<volist name="dmlist" id="vo">
+			<div class="block_row">
+				<span class="block-left">
+					<span class="glyphicon glyphicon-inbox" style="color:#888"></span>
+				</span>
+				<div class="block-mid">
+					{$vo.content}
+				</div>
+				<div class="block-right" title="" data-placement="right" data-toggle="tooltip" data-original-title="已完成">
+					<span class="glyphicon glyphicon-thumbs-up" style="color:#888"></span>
+				</div>
+			</div>
+		
+		</volist>
+	</div>
+
+</div>
+</html>

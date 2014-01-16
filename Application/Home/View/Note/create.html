@@ -1,0 +1,144 @@
+<style>
+	.top{
+		background: #ababab;
+		box-shadow: 1px 1px 5px #111;
+		border-radius: 2px 2px 2px 2px;
+		width:100%;
+		height:100px;
+	}
+	.block_note{
+		margin-top:30px;
+		margin-left:auto;
+		margin-right:auto;
+		width:96%;
+		height:280px;
+		padding:5px;
+		overflow-y: auto;
+		background: #FFF9AD;
+		border-radius: 2px 2px 2px 30px;
+		box-shadow: 1px 1px 5px #666;
+
+	}
+	.ta{
+		padding:2px 2px 2px 4px;
+		height:85%;
+		width:100%;
+		border:1px solid #bbb;
+		resize:none;
+		background:#FFF9AD;
+		border-radius: 2px;
+	}
+	.ta:hover{
+		box-shadow: 0px 0px 2px #1E7FFF;
+		background: #FFF9AA;
+	}
+	.bt_control{
+		margin-top:2px;
+		padding-top:2px;
+	}
+	.top_title{
+		padding-left:20px;
+		font-size:22px;
+		margin-top:10px;
+		height:30px;
+		width:100%;
+	}
+</style>
+<script type="text/javascript"	>
+	$(document).ready(function() {
+		$('.save_public').on('click',function(event) {
+			var parent=$(this).parent();
+			var content=parent.parent().find('#content').val();
+			content=$.trim(content);
+			
+			save("public",content,parent);
+		});
+		$('.save_private').on('click',function(event) {
+			var parent=$(this).parent();
+			var content=parent.parent().find('#content').val();
+			content=$.trim(content);
+			save("private",content,parent);
+		});
+	});
+	function save(type,content,parent){
+		if(content==""){
+			alert("内容为空，无需保存!");
+			return;
+		}
+
+		$.ajax({
+			url: '__MODULE__/Note/doAddNote',
+			type: 'post',
+			data: {'type':type,'content':content},
+		})
+		.done(function(re) {
+			console.log("success");
+			console.log(re);
+			if(re=="success"){
+				alert("已保存");
+				parent.parent().find("#content").val("");
+			}else{
+				alert("保存失败");
+			}
+		})
+		.fail(function() {
+			console.log("error");
+		})
+		.always(function() {  
+			console.log("complete");
+		});
+		
+	}
+</script>
+<div class="create">
+	<div class="top">
+		&nbsp;
+		<div class="top_title">
+			<span class="glyphicon glyphicon-pencil"> </span>  
+			随手记录，避免遗忘！
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="block_note">
+			<textarea class="ta" name="content" id="content" ></textarea>
+			<div class="bt_control text-right">
+				<span class="text-warning" id="state">保存为:</span>
+				<button class="save_public btn btn-primary btn-sm">
+					公开
+				</button>
+				<button class="save_private btn btn-primary btn-sm" >
+					个人
+				</button>
+			</div>
+		</div>
+
+	</div>
+	<div class="col-md-4">
+		<div class="block_note">
+			<textarea class="ta" name="content" id="content" ></textarea>
+			<div class="bt_control text-right">
+				<span class="text-warning" id="state">保存为:</span>
+				<button class="save_public btn btn-primary btn-sm" >
+					公开
+				</button>
+				<button class="save_private btn btn-primary btn-sm" >
+					个人
+				</button>      
+			</div>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="block_note">
+			<textarea class="ta" name="content" id="content" ></textarea>
+			<div class="bt_control text-right">
+				<span class="text-warning" id="state">保存为:</span>
+				<button class="save_public btn btn-primary btn-sm">
+					公开
+				</button>
+				<button class="save_private btn btn-primary btn-sm" >
+					个人
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
